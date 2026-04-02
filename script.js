@@ -2,14 +2,6 @@ document.getElementById('fileInput').addEventListener('change', handleFile);
 document.getElementById('searchInput').addEventListener('input', debounceSearch);
 document.getElementById('clearBtn').addEventListener('click', clearStoredData);
 
-let data = [];
-let filteredData = [];
-let currentPage = 1;
-const rowsPerPage = 100;
-
-// ADD THESE TWO LINES
-let currentSearchTerms = [];  // Tracks your active search terms
-let isFirstSearch = true;     // Flag to know when to reset
 // IndexedDB setup
 const dbName = 'MaterialStockDB';
 const storeName = 'stockData';
