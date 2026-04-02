@@ -135,12 +135,14 @@ function debounceSearch() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         
         if (query === '') {
+            // If search is empty, go back to original data
             filteredData = [...data];
         } else {
             // Split query into individual words for multi-term search
             const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
             
-            filteredData = data.filter(row =>
+            // Search within the CURRENT filteredData (not original data)
+            filteredData = filteredData.filter(row =>
                 // Check if ALL search terms are found in ANY of the columns
                 searchTerms.every(term =>
                     [columnMap.materialNo, columnMap.description, columnMap.binNo, columnMap.valStock, columnMap.mvgAvgPrice].some(colIndex =>
