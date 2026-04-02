@@ -133,15 +133,23 @@ function debounceSearch() {
     clearTimeout(window.searchTimeout);
     window.searchTimeout = setTimeout(() => {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        
         if (query === '') {
             filteredData = [...data];
         } else {
+            // Split query into individual words for multi-term search
+            const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+            
             filteredData = data.filter(row =>
-                [columnMap.materialNo, columnMap.description, columnMap.binNo, columnMap.valStock, columnMap.mvgAvgPrice].some(colIndex =>
-                    String(row[colIndex] || '').toLowerCase().includes(query)
+                // Check if ALL search terms are found in ANY of the columns
+                searchTerms.every(term =>
+                    [columnMap.materialNo, columnMap.description, columnMap.binNo, columnMap.valStock, columnMap.mvgAvgPrice].some(colIndex =>
+                        String(row[colIndex] || '').toLowerCase().includes(term)
+                    )
                 )
             );
         }
+        
         currentPage = 1;
         renderPage(currentPage);
     }, 300);
