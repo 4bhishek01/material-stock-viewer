@@ -142,17 +142,35 @@ function debounceSearch() {
     window.searchTimeout = setTimeout(() => {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         
-        if (query === '') {
-            // If search is empty, go back to original data
+        // Get all words typed so far
+        const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+        
+        // Check if this is a new search (input was cleared before typing)
+        if (searchTerms.length === 0) {
             filteredData = [...data];
-        } else {
-            // Split query into individual words for multi-term search
-            const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+            currentSearchTerms = [];
+            isFirstSearch = true;
+        } 
+        // If adding a new term (not clearing)
+        else if (isFirstSearch || searchTerms.length > currentSearchTerms.length) {
+            // New search starting fresh
+            currentSearchTerms = searchTerms;
+            isFirstSearch = false;
             
-            // Search within the CURRENT filteredData (not original data)
-            filteredData = filteredData.filter(row =>
-                // Check if ALL search terms are found in ANY of the columns
-                searchTerms.every(term =>
+            filteredData = data.filter(row =>
+                currentSearchTerms.every(term =>
+                    [columnMap.materialNo, columnMap.description, columnMap.binNo, columnMap.valStock, columnMap.mvgAvgPrice].some(colIndex =>
+                        String(row[colIndex] || '').toLowerCase().includes(term)
+                    )
+                )
+            );
+        }
+        // If removing a term (user deleted a word)
+        else if (searchTerms.length < currentSearchTerms.length) {
+            currentSearchTerms = searchTerms;
+            
+            filteredData = data.filter(row =>
+                currentSearchTerms.every(term =>
                     [columnMap.materialNo, columnMap.description, columnMap.binNo, columnMap.valStock, columnMap.mvgAvgPrice].some(colIndex =>
                         String(row[colIndex] || '').toLowerCase().includes(term)
                     )
@@ -164,7 +182,6 @@ function debounceSearch() {
         renderPage(currentPage);
     }, 300);
 }
-
 async function clearStoredData() {
     const password = prompt('Enter password to clear stored data:');
     if (password === 'Kirito01') {
